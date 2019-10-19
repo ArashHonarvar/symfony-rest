@@ -102,9 +102,13 @@ class ApiController extends AbstractController
 
     private function handleProgrammer($data, Programmer $programmer)
     {
-        $programmer->setAvatarNumber($data['avatarNumber']);
         $programmer->setNickName($data['nickName']);
         $programmer->setTagLine($data['tagLine']);
+
+        $isNew = !$programmer->getId();
+        if ($isNew) {
+            $programmer->setAvatarNumber($data['avatarNumber']);
+        }
 
         $this->getDoctrine()->getManager()->persist($programmer);
         $this->getDoctrine()->getManager()->flush();
