@@ -37,17 +37,14 @@ class ApiController extends AbstractController
      */
     public function addProgrammer(Request $request)
     {
-        $nickName = $request->get('nickName');
-        $avatarNumber = $request->get('avatarNumber');
-        $tagLine = $request->get('tagLine');
+        $data['nickName'] = $request->get('nickName');
+        $data['avatarNumber'] = $request->get('avatarNumber');
+        $data['tagLine'] = $request->get('tagLine');
 
         $programmer = new Programmer();
-        $programmer->setAvatarNumber($avatarNumber);
-        $programmer->setNickName($nickName);
-        $programmer->setTagLine($tagLine);
 
-        $this->getDoctrine()->getManager()->persist($programmer);
-        $this->getDoctrine()->getManager()->flush();
+        $this->handleProgrammer($data, $programmer);
+
 
         $response = new JsonResponse($this->serilizeProgrammer($programmer), 201, ['location' => $this->generateUrl('app_api_show_programmer', ['nickName' => $programmer->getNickName()])]);
 
@@ -80,14 +77,10 @@ class ApiController extends AbstractController
         if (empty($programmer)) {
             throw new NotFoundHttpException();
         } else {
-            $newNickName = $request->get('nickName');
-            $newTagLine = $request->get('tagLine');
-            $newAvatarNumber = $request->get('avatarNumber');
-            $programmer->setAvatarNumber($newAvatarNumber);
-            $programmer->setNickName($newNickName);
-            $programmer->setTagLine($newTagLine);
-            $this->getDoctrine()->getManager()->persist($programmer);
-            $this->getDoctrine()->getManager()->flush();
+            $data['nickName'] = $request->get('nickName');
+            $data['avatarNumber'] = $request->get('avatarNumber');
+            $data['tagLine'] = $request->get('tagLine');
+            $this->handleProgrammer($data, $programmer);
             $response = new JsonResponse($this->serilizeProgrammer($programmer), 201, ['location' => $this->generateUrl('app_api_show_programmer', ['nickName' => $programmer->getNickName()])]);
             return $response;
         }
@@ -104,6 +97,19 @@ class ApiController extends AbstractController
 
         return $data;
 
+    }
+
+
+    private function handleProgrammer($data, Programmer $programmer)
+    {
+        $programmer->setAvatarNumber($data['avatarNumber']);
+        $programmer->setNickName($data['nickName']);
+        $programmer->setTagLine($data['tagLine']);
+
+        $this->getDoctrine()->getManager()->persist($programmer);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $programmer;
     }
 
 }
