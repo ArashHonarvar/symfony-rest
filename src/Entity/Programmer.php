@@ -5,70 +5,177 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Programmer
+ *
+ * @ORM\Table(name="battle_programmer")
  * @ORM\Entity(repositoryClass="App\Repository\ProgrammerRepository")
  */
 class Programmer
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var string
+     *
+     * @ORM\Column(name="nickname", type="string", length=100, unique=true)
      */
-    private $nickName;
+    private $nickname;
 
     /**
-     * @ORM\Column(type="integer", length=255)
+     * @var integer
+     *
+     * @ORM\Column(name="avatarNumber", type="integer")
      */
     private $avatarNumber;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var string
+     *
+     * @ORM\Column(name="tagLine", type="string", length=255, nullable=true)
      */
     private $tagLine;
 
-    public function getId(): ?int
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="powerLevel", type="integer")
+     */
+    private $powerLevel = 0;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    private $user;
+
+    public function __construct($nickname = null, $avatarNumber = null)
+    {
+        $this->nickname = $nickname;
+        $this->avatarNumber = $avatarNumber;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getNickName(): ?string
+    /**
+     * Set nickname
+     *
+     * @param string $nickname
+     * @return Programmer
+     */
+    public function setNickname($nickname)
     {
-        return $this->nickName;
-    }
-
-    public function setNickName(string $nickName): self
-    {
-        $this->nickName = $nickName;
+        $this->nickname = $nickname;
 
         return $this;
     }
 
-    public function getAvatarNumber(): ?int
+    /**
+     * Get nickname
+     *
+     * @return string 
+     */
+    public function getNickname()
     {
-        return $this->avatarNumber;
+        return $this->nickname;
     }
 
-    public function setAvatarNumber(int $avatarNumber): self
+    /**
+     * Set avatarNumber
+     *
+     * @param integer $avatarNumber
+     * @return Programmer
+     */
+    public function setAvatarNumber($avatarNumber)
     {
         $this->avatarNumber = $avatarNumber;
 
         return $this;
     }
 
-    public function getTagLine(): ?string
+    /**
+     * Get avatarNumber
+     *
+     * @return integer 
+     */
+    public function getAvatarNumber()
     {
-        return $this->tagLine;
+        return $this->avatarNumber;
     }
 
-    public function setTagLine(string $tagLine): self
+    /**
+     * Set tagLine
+     *
+     * @param string $tagLine
+     * @return Programmer
+     */
+    public function setTagLine($tagLine)
     {
         $this->tagLine = $tagLine;
 
         return $this;
+    }
+
+    /**
+     * Get tagLine
+     *
+     * @return string 
+     */
+    public function getTagLine()
+    {
+        return $this->tagLine;
+    }
+
+    /**
+     * Set powerLevel
+     *
+     * @param integer $powerLevel
+     * @return Programmer
+     */
+    public function setPowerLevel($powerLevel)
+    {
+        $this->powerLevel = $powerLevel;
+
+        return $this;
+    }
+
+    /**
+     * Get powerLevel
+     *
+     * @return integer 
+     */
+    public function getPowerLevel()
+    {
+        return $this->powerLevel;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param USer $user
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
     }
 }

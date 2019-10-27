@@ -2,49 +2,27 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\EntityRepository;
+use App\Entity\User;
 use App\Entity\Programmer;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 
-/**
- * @method Programmer|null find($id, $lockMode = null, $lockVersion = null)
- * @method Programmer|null findOneBy(array $criteria, array $orderBy = null)
- * @method Programmer[]    findAll()
- * @method Programmer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class ProgrammerRepository extends ServiceEntityRepository
+class ProgrammerRepository extends EntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @param User $user
+     * @return Programmer[]
+     */
+    public function findAllForUser(User $user)
     {
-        parent::__construct($registry, Programmer::class);
+        return $this->findBy(array('user' => $user));
     }
 
-    // /**
-    //  * @return Programmer[] Returns an array of Programmer objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param $nickname
+     * @return Programmer
+     */
+    public function findOneByNickname($nickname)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->findOneBy(array('nickname' => $nickname));
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Programmer
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
