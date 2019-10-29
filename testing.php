@@ -11,18 +11,32 @@ $client = new \GuzzleHttp\Client([
 
 $nickName = "Programmer" . rand(0, 99999);
 $data = [
-    'nickName' => $nickName,
+    'nickname' => $nickName,
     'avatarNumber' => 2,
     'tagLine' => 'A good Programmer'
 ];
 
-$response = $client->post("/api/programmers" , [
+// Create Programmer
+$response = $client->post("/api/programmers", [
     'body' => json_encode($data)
 ]);
 
+// Show One Programmer
+$programmerUrl = $response->getHeader('location')[0];
+$response = $client->get($programmerUrl);
+
+// Show Collection of Programmers
+$response = $client->get("/api/programmers");
+
+
+echo "Status Code: ";
 echo $response->getStatusCode();
-echo "\n\n";
-echo $response->getHeader('content-type')[0];
-echo "\n\n";
+echo "\n";
+foreach ($response->getHeaders() as $key => $header) {
+    echo $key . ": ";
+    echo $header[0];
+    echo "\n";
+}
+echo "Body: ";
 echo $response->getBody();
-echo "\n\n";
+echo "\n";

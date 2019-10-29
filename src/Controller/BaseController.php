@@ -8,6 +8,8 @@ use App\Repository\UserRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\BattleRepository;
 use App\Repository\ApiTokenRepository;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -110,5 +112,13 @@ abstract class BaseController extends AbstractController
     {
         return $this->getDoctrine()
             ->getRepository('App:ApiToken');
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    protected function getEm()
+    {
+        return $this->getDoctrine()->getManager();
     }
 }
