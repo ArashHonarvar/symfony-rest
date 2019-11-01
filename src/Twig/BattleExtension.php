@@ -3,8 +3,9 @@
 namespace App\Twig;
 
 use App\Entity\Programmer;
+use Twig\Extension\AbstractExtension;
 
-class BattleExtension extends \Twig_Extension
+class BattleExtension extends AbstractExtension
 {
     public function getFilters()
     {

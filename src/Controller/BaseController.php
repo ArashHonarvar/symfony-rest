@@ -41,14 +41,14 @@ abstract class BaseController extends AbstractController
         $this->container->get('security.token_storage')->setToken($token);
     }
 
-    public function addFlash($message, $positiveNotice = true)
-    {
-        /** @var Request $request */
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        $noticeKey = $positiveNotice ? 'notice_happy' : 'notice_sad';
-
-        $request->getSession()->getFlashbag()->add($noticeKey, $message);
-    }
+//    public function addFlash($message, $positiveNotice = true)
+//    {
+//        /** @var Request $request */
+//        $request = $this->container->get('request_stack')->getCurrentRequest();
+//        $noticeKey = $positiveNotice ? 'notice_happy' : 'notice_sad';
+//
+//        $request->getSession()->getFlashbag()->add($noticeKey, $message);
+//    }
 
     /**
      * Used to find the fixtures user - I use it to cheat in the beginning
