@@ -5,6 +5,8 @@ namespace App\Controller\Api;
 use App\Battle\PowerManager;
 use App\Entity\Programmer;
 use App\Form\ProgrammerType;
+use App\Form\UpdateProgrammerType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,11 +27,9 @@ class ProgrammerController extends BaseController
      */
     public function newAction(Request $request)
     {
-        $body = $request->getContent();
-        $data = json_decode($body, true);
         $programmer = new Programmer();
         $form = $this->createForm(ProgrammerType::class, $programmer);
-        $form->submit($data);
+        $this->processForm($request, $form);
         $programmer->setUser($this->findUserByUsername("arash"));
         $this->getEm()->persist($programmer);
         $this->getEm()->flush();
@@ -70,6 +70,33 @@ class ProgrammerController extends BaseController
         }
         $response = new JsonResponse($data);
         return $response;
+    }
+
+    /**
+     * @Route("/programmers/{nickname}" , name="app_api_programmers_update" , methods={"PUT"})
+     */
+    public function updateAction($nickname, Request $request)
+    {
+        $programmer = $this->getEm()->getRepository(Programmer::class)->findOneByNickname($nickname);
+
+        if (!$programmer) {
+            throw $this->createNotFoundException('No programmer with username ' . $nickname);
+        }
+
+        $form = $this->createForm(UpdateProgrammerType::class, $programmer );
+        $this->processForm($request, $form);
+        $this->getEm()->persist($programmer);
+        $this->getEm()->flush();
+        $data = $this->serializeProgrammer($programmer);
+        $response = New JsonResponse($data, 200);
+        return $response;
+    }
+
+    private function processForm(Request $request, FormInterface $form)
+    {
+        $body = $request->getContent();
+        $data = json_decode($body, true);
+        $form->submit($data);
     }
 
 

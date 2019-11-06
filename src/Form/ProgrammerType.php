@@ -17,7 +17,9 @@ class ProgrammerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nickname', TextType::class)
+            ->add('nickname', TextType::class , [
+                "disabled" => $options['is_edit']
+            ])
             ->add('avatarNumber', ChoiceType::class, [
                 'choices' => [
                     "Girl" => 1,
@@ -34,7 +36,8 @@ class ProgrammerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Programmer::class
+            'data_class' => Programmer::class,
+            'is_edit' => false
         ]);
     }
 

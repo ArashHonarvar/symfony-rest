@@ -72,20 +72,71 @@ class ProgrammerControllerTest extends ApiTestCase
         }
 
         $this->assertEquals(200, $response->getStatusCode());
-
-        $data = (array)json_decode($response->getBody()->getContents());
-
-
-        $this->assertEquals(
+        $this->asserter()->assertResponsePropertiesExist($response,
             [
                 'nickname',
                 'avatarNumber',
                 'powerLevel',
                 'tagLine'
-            ],
-            array_keys($data)
-        );
+            ]);
+        $this->asserter()->assertResponsePropertyEquals($response, 'nickname', "UnitTester");
+    }
 
+    public function testGETProgrammesCollection()
+    {
+        $this->createProgrammer([
+            'nickname' => 'UnitTester',
+            'avatarNumber' => 3,
+        ]);
+        $this->createProgrammer([
+            'nickname' => 'CowboyCoder',
+            'avatarNumber' => 5,
+        ]);
+
+        try {
+            $response = $this->client->get('/api/programmers');
+        } catch (\Exception $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                dump($this->debugResponse($response)); // Body
+            }
+        }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->asserter()->assertResponsePropertyIsArray($response, "programmers");
+        $this->asserter()->assertResponsePropertyCount($response, "programmers", 2);
+        $this->asserter()->assertResponsePropertyEquals($response, 'programmers[1].nickname', "CowboyCoder");
+    }
+
+
+    public function testPUTProgrammer()
+    {
+        $this->createProgrammer([
+            'nickname' => 'CowboyCoder',
+            'avatarNumber' => 5,
+            'tagLine' => 'foo'
+        ]);
+
+        $data = [
+            'nickname' => 'CowgirlCoder',
+            'avatarNumber' => 2,
+            'tagLine' => 'foo'
+        ];
+
+
+        try {
+            $response = $this->client->put("/api/programmers/CowboyCoder", [
+                'body' => json_encode($data)
+            ]);
+        } catch (\Exception $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                dump($this->debugResponse($response)); // Body
+            }
+        }
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->asserter()->assertResponsePropertyEquals($response, 'avatarNumber', 2);
+        $this->asserter()->assertResponsePropertyEquals($response, 'nickname', 'CowboyCoder');
     }
 
 
