@@ -160,5 +160,38 @@ class ProgrammerControllerTest extends ApiTestCase
         $this->assertEquals(204, $response->getStatusCode());
     }
 
+    public function testValidationErrors()
+    {
+        $data = [
+            'avatarNumber' => 2,
+            'tagLine' => 'A good Programmer'
+        ];
+
+        // Create Programmer
+
+
+        try {
+            $response = $this->client->post("/api/programmers", [
+                'body' => json_encode($data)
+            ]);
+        } catch (\Exception $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                dump($this->debugResponse($response)); // Body
+            }
+        }
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->asserter()->assertResponsePropertiesExist($response, [
+            "type",
+            "title",
+            "errors"
+        ]);
+        $this->asserter()->assertResponsePropertyExists($response, "errors.nickname");
+        $this->asserter()->assertResponsePropertyEquals($response, 'errors.nickname[0]', "Please enter a clever nickname");
+        $this->asserter()->assertResponsePropertyDoesNotExist($response, 'errors.avatarNumber');
+        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type')[0]);
+    }
+
 
 }

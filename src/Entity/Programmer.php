@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Programmer
@@ -25,6 +26,7 @@ class Programmer
     /**
      * @var string
      *
+     * @Assert\NotBlank(message="Please enter a clever nickname")
      * @Serializer\Expose()
      * @ORM\Column(name="nickname", type="string", length=100, unique=true)
      */

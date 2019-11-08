@@ -33,6 +33,10 @@ class ProgrammerController extends BaseController
         $programmer = new Programmer();
         $form = $this->createForm(ProgrammerType::class, $programmer);
         $this->processForm($request, $form);
+        if (!$form->isValid()) {
+            return $this->createValidationErrorResponse($form);
+        }
+
         $programmer->setUser($this->findUserByUsername("arash"));
         $this->getEm()->persist($programmer);
         $this->getEm()->flush();
@@ -82,6 +86,9 @@ class ProgrammerController extends BaseController
 
         $form = $this->createForm(UpdateProgrammerType::class, $programmer);
         $this->processForm($request, $form);
+        if (!$form->isValid()) {
+            return $this->createValidationErrorResponse($form);
+        }
         $this->getEm()->persist($programmer);
         $this->getEm()->flush();
         $response = $this->createApiResponse($programmer);
@@ -107,7 +114,40 @@ class ProgrammerController extends BaseController
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
-        $form->submit($data);
+        $clearMissing = $request->getMethod() != 'PATCH';
+        $form->submit($data, $clearMissing);
+    }
+
+
+    private function getErrorsFromForm(FormInterface $form)
+    {
+        $errors = array();
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        foreach ($form->all() as $childForm) {
+            if ($childForm instanceof FormInterface) {
+                if ($childErrors = $this->getErrorsFromForm($childForm)) {
+                    $errors[$childForm->getName()] = $childErrors;
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    private function createValidationErrorResponse(FormInterface $form)
+    {
+        $errors = $this->getErrorsFromForm($form);
+        $data = [
+            "type" => "validation_error",
+            "title" => "There was a validation error",
+            "errors" => $errors
+        ];
+        $response = new JsonResponse($data, 400);
+        $response->headers->set("Content-type", "application/problem+json");
+        return $response;
     }
 
 
