@@ -3,10 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Programmer
- *
+ * @Serializer\ExclusionPolicy("all")
  * @ORM\Table(name="battle_programmer")
  * @ORM\Entity(repositoryClass="App\Repository\ProgrammerRepository")
  */
@@ -24,6 +25,7 @@ class Programmer
     /**
      * @var string
      *
+     * @Serializer\Expose()
      * @ORM\Column(name="nickname", type="string", length=100, unique=true)
      */
     private $nickname;
@@ -31,6 +33,7 @@ class Programmer
     /**
      * @var integer
      *
+     * @Serializer\Expose()
      * @ORM\Column(name="avatarNumber", type="integer")
      */
     private $avatarNumber;
@@ -38,6 +41,7 @@ class Programmer
     /**
      * @var string
      *
+     * @Serializer\Expose()
      * @ORM\Column(name="tagLine", type="string", length=255, nullable=true)
      */
     private $tagLine;
@@ -45,6 +49,7 @@ class Programmer
     /**
      * @var integer
      *
+     * @Serializer\Expose()
      * @ORM\Column(name="powerLevel", type="integer")
      */
     private $powerLevel = 0;
@@ -64,7 +69,7 @@ class Programmer
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -87,7 +92,7 @@ class Programmer
     /**
      * Get nickname
      *
-     * @return string 
+     * @return string
      */
     public function getNickname()
     {
@@ -110,7 +115,7 @@ class Programmer
     /**
      * Get avatarNumber
      *
-     * @return integer 
+     * @return integer
      */
     public function getAvatarNumber()
     {
@@ -133,7 +138,7 @@ class Programmer
     /**
      * Get tagLine
      *
-     * @return string 
+     * @return string
      */
     public function getTagLine()
     {
@@ -156,7 +161,7 @@ class Programmer
     /**
      * Get powerLevel
      *
-     * @return integer 
+     * @return integer
      */
     public function getPowerLevel()
     {

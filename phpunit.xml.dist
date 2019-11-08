@@ -6,15 +6,19 @@
          backupGlobals="false"
          colors="true"
          bootstrap="config/bootstrap.php"
+         forceCoversAnnotation="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true"
 >
     <php>
-        <ini name="error_reporting" value="-1"/>
+        <ini name="error_reporting" value="-1" />
+        <server name="SHELL_VERBOSITY" value="-1" />
         <server name="APP_ENV" value="test" force="true"/>
-        <server name="SHELL_VERBOSITY" value="-1"/>
-        <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
-        <server name="SYMFONY_PHPUNIT_VERSION" value="7.5"/>
-        <server name="SYMFONY_PHPUNIT_VERSION" value="7.5"/>
+        <server name="KERNEL_CLASS" value="App\Kernel"/>
         <env name="TEST_BASE_URI" value="http://127.0.0.1:8000"/>
+        <env name="DATABASE_URL" value="mysql://root:@localhost:3306/rest_test"/>
     </php>
 
     <testsuites>

@@ -72,6 +72,7 @@ class ProgrammerControllerTest extends ApiTestCase
         }
 
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($response->getHeader("Content-type")[0], "application/json");
         $this->asserter()->assertResponsePropertiesExist($response,
             [
                 'nickname',
@@ -137,6 +138,26 @@ class ProgrammerControllerTest extends ApiTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->asserter()->assertResponsePropertyEquals($response, 'avatarNumber', 2);
         $this->asserter()->assertResponsePropertyEquals($response, 'nickname', 'CowboyCoder');
+    }
+
+
+    public function testDELETEProgrammer()
+    {
+        $this->createProgrammer([
+            'nickname' => 'UnitTester',
+            'avatarNumber' => 3,
+        ]);
+
+        try {
+            $response = $this->client->delete('/api/programmers/UnitTester');
+        } catch (\Exception $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                dump($this->debugResponse($response)); // Body
+            }
+        }
+
+        $this->assertEquals(204, $response->getStatusCode());
     }
 
 

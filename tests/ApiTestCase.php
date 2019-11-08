@@ -219,7 +219,7 @@ class ApiTestCase extends KernelTestCase
      */
     protected function getEm()
     {
-        return $this->getService('doctrine')->getManager();
+        return $this->getService('doctrine.orm.entity_manager');
     }
 
     protected function asserter()

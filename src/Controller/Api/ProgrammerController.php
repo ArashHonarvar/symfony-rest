@@ -14,6 +14,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use App\Controller\BaseController;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class ProgrammerController
@@ -36,8 +39,7 @@ class ProgrammerController extends BaseController
         $location = $this->generateUrl('app_api_programmers_show', [
             'nickname' => $programmer->getNickname()
         ]);
-        $data = $this->serializeProgrammer($programmer);
-        $response = New JsonResponse($data, 201);
+        $response = $this->createApiResponse($programmer, 201);
         $response->headers->set('location', $location);
         return $response;
     }
@@ -52,8 +54,7 @@ class ProgrammerController extends BaseController
         if (!$programmer) {
             throw $this->createNotFoundException('No programmer with username ' . $nickname);
         }
-        $data = $this->serializeProgrammer($programmer);
-        $response = new JsonResponse($data);
+        $response = $this->createApiResponse($programmer);
         return $response;
     }
 
@@ -63,12 +64,8 @@ class ProgrammerController extends BaseController
     public function listAction()
     {
         $programmers = $this->getEm()->getRepository(Programmer::class)->findAll();
-        $data = ["programmers" => []];
-
-        foreach ($programmers as $programmer) {
-            $data['programmers'][] = $this->serializeProgrammer($programmer);
-        }
-        $response = new JsonResponse($data);
+        $data = ["programmers" => $programmers];
+        $response = $this->createApiResponse($data);
         return $response;
     }
 
@@ -83,13 +80,27 @@ class ProgrammerController extends BaseController
             throw $this->createNotFoundException('No programmer with username ' . $nickname);
         }
 
-        $form = $this->createForm(UpdateProgrammerType::class, $programmer );
+        $form = $this->createForm(UpdateProgrammerType::class, $programmer);
         $this->processForm($request, $form);
         $this->getEm()->persist($programmer);
         $this->getEm()->flush();
-        $data = $this->serializeProgrammer($programmer);
-        $response = New JsonResponse($data, 200);
+        $response = $this->createApiResponse($programmer);
         return $response;
+    }
+
+    /**
+     * @Route("/programmers/{nickname}" , methods={"DELETE"})
+     */
+    public function deleteAction($nickname)
+    {
+        $programmer = $this->getEm()->getRepository(Programmer::class)->findOneByNickname($nickname);
+
+        if ($programmer) {
+            $this->getEm()->remove($programmer);
+            $this->getEm()->flush();
+        }
+
+        return new Response(null, 204);
     }
 
     private function processForm(Request $request, FormInterface $form)
@@ -99,15 +110,5 @@ class ProgrammerController extends BaseController
         $form->submit($data);
     }
 
-
-    private function serializeProgrammer(Programmer $programmer)
-    {
-        return [
-            'nickname' => $programmer->getNickname(),
-            'avatarNumber' => $programmer->getAvatarNumber(),
-            'powerLevel' => $programmer->getPowerLevel(),
-            'tagLine' => $programmer->getTagLine()
-        ];
-    }
 
 }
