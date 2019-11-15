@@ -2,6 +2,8 @@
 
 namespace App\Controller\Api;
 
+use App\Api\ApiProblem;
+use App\Api\ApiProblemException;
 use App\Battle\PowerManager;
 use App\Entity\Programmer;
 use App\Form\ProgrammerType;
@@ -10,6 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -21,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Class ProgrammerController
  * @package App\Controller\Web
- * @Route("/api")
+ * @Route("/api" , defaults={"_format" : "JSON"})
  */
 class ProgrammerController extends BaseController
 {
@@ -34,7 +37,7 @@ class ProgrammerController extends BaseController
         $form = $this->createForm(ProgrammerType::class, $programmer);
         $this->processForm($request, $form);
         if (!$form->isValid()) {
-            return $this->createValidationErrorResponse($form);
+             $this->throwApiProblemValidationException($form);
         }
 
         $programmer->setUser($this->findUserByUsername("arash"));
@@ -87,7 +90,7 @@ class ProgrammerController extends BaseController
         $form = $this->createForm(UpdateProgrammerType::class, $programmer);
         $this->processForm($request, $form);
         if (!$form->isValid()) {
-            return $this->createValidationErrorResponse($form);
+             $this->throwApiProblemValidationException($form);
         }
         $this->getEm()->persist($programmer);
         $this->getEm()->flush();
@@ -114,6 +117,14 @@ class ProgrammerController extends BaseController
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
+        if (null === $data) {
+            $apiProblem = new ApiProblem(
+                400,
+                ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT
+            );
+
+            throw new ApiProblemException($apiProblem);
+        }
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
     }
@@ -137,17 +148,16 @@ class ProgrammerController extends BaseController
         return $errors;
     }
 
-    private function createValidationErrorResponse(FormInterface $form)
+    private function throwApiProblemValidationException(FormInterface $form)
     {
         $errors = $this->getErrorsFromForm($form);
-        $data = [
-            "type" => "validation_error",
-            "title" => "There was a validation error",
-            "errors" => $errors
-        ];
-        $response = new JsonResponse($data, 400);
-        $response->headers->set("Content-type", "application/problem+json");
-        return $response;
+        $apiProblem = new ApiProblem(
+            400,
+            ApiProblem::TYPE_VALIDATION_ERROR
+        );
+
+        $apiProblem->set("errors", $errors);
+        throw new ApiProblemException($apiProblem);
     }
 
 

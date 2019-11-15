@@ -32,3 +32,8 @@ services:
 
     battle.power_manager:
         class: App\Battle\PowerManager
+
+    api_problem_subscriber:
+        class: App\EventListener\ApiExceptionSubscriber
+        tags:
+            - { name: kernel.event_subscriber }
